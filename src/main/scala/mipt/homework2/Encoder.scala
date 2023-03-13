@@ -11,4 +11,4 @@ object Encoder:
 
   given Contravariant[Encoder] = new Contravariant[Encoder]:
     override def contramap[A, B](fa: Encoder[A])(f: B => A): Encoder[B] =
-      task"Реализуйте Contravariant для Encoder" (3, 0)
+      (data: B) => fa(f(data))

@@ -20,8 +20,9 @@ object Decoder:
   def decode[E, T](raw: String)(using decoder: Decoder[E, T]): Decoder.Result[E, T] =
     decoder(raw)
 
-  given Bifunctor[Decoder] =
-    task"Реализуйте Bifunctor для Decoder, используя Either.left проекцию" (2, 0)
+  given Bifunctor[Decoder] = new Bifunctor[Decoder]:
+    override def bimap[A, B, C, D](fab: Decoder[A, B])(f: A => C, g: B => D): Decoder[C, D] =
+      (data: String) => fab(data).map(g).left.map(f)
 
 object FDecoder:
 
@@ -30,4 +31,6 @@ object FDecoder:
   def decode[T](raw: String)(using decoder: FDecoder[T]): Decoder.Result[DecoderError, T] =
     decoder(raw)
 
-  given Functor[FDecoder] = task"Реализуйте Functor для Decoder" (1, 0)
+  given Functor[FDecoder] = new Functor[FDecoder]:
+    override def map[A, B](fa: FDecoder[A])(f: A => B): FDecoder[B] =
+      (data: String) => fa(data).map(f)

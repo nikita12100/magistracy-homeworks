@@ -7,16 +7,16 @@ import org.scalatest.flatspec.{AnyFlatSpec, AnyFlatSpecLike}
 import org.scalatest.matchers.should.Matchers
 
 class CommonDecoderTests(using
-                         Decoder[DecoderError, Int],
-                         Decoder[DecoderError, Boolean],
-                         Decoder[DecoderError, String],
-                         Decoder[DecoderError, DegreesFahrenheit],
-                         Decoder[DecoderError, Option[Int]],
-                         Decoder[DecoderError, Option[String]],
-                         Decoder[DecoderError, List[Int]],
-                         Decoder[DecoderError, List[Option[Int]]],
-                         Decoder[DecoderError, List[Option[String]]],
-                         Decoder[DecoderError, Option[List[Int]]]
+    Decoder[DecoderError, Int],
+    Decoder[DecoderError, Boolean],
+    Decoder[DecoderError, String],
+    Decoder[DecoderError, DegreesFahrenheit],
+    Decoder[DecoderError, Option[Int]],
+    Decoder[DecoderError, Option[String]],
+    Decoder[DecoderError, List[Int]],
+    Decoder[DecoderError, List[Option[Int]]],
+    Decoder[DecoderError, List[Option[String]]],
+    Decoder[DecoderError, Option[List[Int]]]
 ) extends AnyFlatSpec with Matchers:
   behavior.of("Decoder")
 

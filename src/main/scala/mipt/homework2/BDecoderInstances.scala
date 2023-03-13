@@ -6,25 +6,33 @@ import cats.implicits.toBifunctorOps
 import scala.util.{Failure, Success, Try}
 
 trait OptionBDecoderInstances:
-  given [E, T](using decoder: Decoder[E, T]): Decoder[E, Option[T]] =
-    task"""Реализуйте декодер для Option и произвольного типа,
-           для которого есть Decoder в скоупе. Если исходная строка - пустая,
-           или имеет значение `<none>` или null, то в результате должен быть None""" (2, 1)
+  given [E, T](using decoder: Decoder[E, T]): Decoder[E, Option[T]] = new Decoder[E, Option[T]] {
+    override def apply(raw: String): Result[E, Option[T]] = raw match {
+      case ""          => Right(None)
+      case null        => Right(None)
+      case "<none>"    => Right(None)
+      case raw: String => decoder(raw).map(Some(_))
+    }
+  }
 
 trait ListBDecoderInstances:
-  given [E, T](using decoder: Decoder[E, T]): Decoder[E, List[T]] =
-    task"""Реализуйте декодер для List и произвольного типа, для которого есть Decoder в скоупе.
-           Элементы листа в исходной строке разделены запятой.""" (2, 2)
+  given [E, T](using decoder: Decoder[E, T]): Decoder[E, List[T]] = new Decoder[E, List[T]] {
+    override def apply(raw: String): Result[E, List[T]] =
+      raw.split(", ").foldLeft[Decoder.Result[E, List[T]]](Right(List())) {
+        case (Right(acc), s) if s.nonEmpty => decode(s).map(acc :+ _)
+        case (Right(acc), _)               => Right(acc)
+        case (Left(e), _)                  => Left(e)
+      }
+  }
 
 object BDecoderInstances extends OptionBDecoderInstances, ListBDecoderInstances:
-  given Decoder[DecoderError, String] =
-    task"Реализуйте декодер из строки в строку" (2, 3)
+  given Decoder[DecoderError, String] = Right(_)
 
   given Decoder[NumberFormatDecoderError.type, Int] =
-    task"Реализуйте декодер из строки в число с заданным типом ошибки, используя Decoder.attempt() и Bifunctor" (2, 4)
+    attempt(_.toInt).bimap(_ => NumberFormatDecoderError, identity)
 
   given Decoder[IllegalArgumentDecoderError.type, Boolean] =
-    task"Реализуйте декодер из строки в булево значение, используя Decoder.attempt() и Bifunctor" (2, 5)
+    attempt(_.toBoolean).bimap(_ => IllegalArgumentDecoderError, identity)
 
-  given Decoder[InvalidDegreesFahrenheitValue.type, DegreesFahrenheit] =
-    task"Реализуйте декодер для DegreesFahrenheit через использование существующего декодера и Bifunctor" (2, 6)
+  given Decoder[InvalidDegreesFahrenheitValue.type, DegreesFahrenheit] = (raw: String) =>
+    decode[NumberFormatDecoderError.type, Int](raw).bimap(_ => InvalidDegreesFahrenheitValue, DegreesFahrenheit.apply)
