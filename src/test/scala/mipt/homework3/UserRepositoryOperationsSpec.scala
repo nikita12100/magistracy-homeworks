@@ -3,7 +3,7 @@ package mipt.homework3
 import cats.MonadThrow
 import cats.syntax.flatMap.toFlatMapOps
 import cats.syntax.functor.toFunctorOps
-import mipt.homework3.UserRepository.Operation.given
+import mipt.homework3.UserRepository.Operations.given
 import mipt.homework3.UserRepository.UserNotFoundError
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -108,14 +108,14 @@ class UserRepositoryOperationsSpec extends AnyFlatSpec with Matchers:
 
   it should "return all users with adult only friends" in {
     UserRepository.Operations
-      .getUsersWithAdultOnlyFriends()
+      .getUsersWithAdultOnlyFriends
       .apply(repo) shouldBe Success(List(communicativeUser1))
   }
 
   it should "correctly delete all junior users" in {
     UserRepository.Operations
-      .deleteAllJuniorUsers[Try]()
-      .flatMap(_ => UserRepository.Operations.findAll[Try]())
+      .deleteAllJuniorUsers[Try]
+      .flatMap(_ => UserRepository.Operations.findAll[Try])
       .map(_.toSet)
       .apply(repo) shouldBe Success(Set(noFriendsAdultUser, communicativeUser2, communicativeUser3))
   }
