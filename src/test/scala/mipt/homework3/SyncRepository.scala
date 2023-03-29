@@ -20,7 +20,7 @@ final case class SyncRepository(initUsers: Map[UserId, User] = Map.empty, initId
       users = users - userId
     }
 
-  override def findAll(): Try[List[User]] =
+  override def findAll: Try[List[User]] =
     Try(users.values.toList)
 
   override def update(user: User): Try[Unit] =
