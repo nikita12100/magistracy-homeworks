@@ -20,18 +20,24 @@ trait UserRepository[F[_]]:
 
 object UserRepositoryDao:
   def apply[F[_]: MonadThrow](dao: UserRepositoryDao)(using Ask[F, Config]): UserRepository[F] = new UserRepository[F]:
-    override def findAll: F[List[User]] = task"""
-          Реализуйте обёртку над методом findAll в dao, используя конфиг из Ask
-          """ (2, 1)
-    override def create(name: UserName, age: Age, friends: Set[UserId]): F[User] = task"""
-          Реализуйте обёртку над методом create в dao, используя конфиг из Ask и обработав ошибку из Either
-          при помощи ApplicativeError
-          """ (2, 2)
-    override def delete(userId: UserId): F[Unit] = task"""
-          Реализуйте обёртку над методом delete в dao, используя конфиг из Ask и обработав ошибку из Either
-          при помощи ApplicativeError
-          """ (2, 3)
-    override def update(user: User): F[Unit] = task"""
-          Реализуйте обёртку над методом update в dao, используя конфиг из Ask и обработав ошибку из Either
-          при помощи ApplicativeError
-          """ (2, 4)
+    override def findAll: F[List[User]] = summon[Ask[F, Config]].reader(dao.findAll)
+
+    override def create(name: UserName, age: Age, friends: Set[UserId]): F[User] =
+      summon[MonadThrow[F]].flatMap(summon[Ask[F, Config]].ask)(cfg =>
+        dao.create(name, age, friends)(cfg) match
+          case Right(user) => MonadThrow[F].pure(user)
+          case Left(e)     => MonadThrow[F].raiseError(new RuntimeException(s"User ${e.name} already exists!"))
+      )
+    override def delete(userId: UserId): F[Unit] =
+      summon[MonadThrow[F]].flatMap(summon[Ask[F, Config]].ask)(cfg =>
+        dao.delete(userId)(cfg) match
+          case Right(user) => MonadThrow[F].pure(user)
+          case Left(e)     => MonadThrow[F].raiseError(new RuntimeException(s"User ${e.id} does not exists!"))
+      )
+
+    override def update(user: User): F[Unit] =
+      summon[MonadThrow[F]].flatMap(summon[Ask[F, Config]].ask)(cfg =>
+        dao.update(user)(cfg) match
+          case Right(user) => MonadThrow[F].pure(user)
+          case Left(e)     => MonadThrow[F].raiseError(new RuntimeException(s"User ${e.id} does not exists!"))
+      )
