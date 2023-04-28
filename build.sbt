@@ -4,7 +4,7 @@ import wartremover.Wart._
 
 name := "magistracy-homeworks"
 version := "0.1"
-scalaVersion := "2.13.10"
+scalaVersion := "3.2.1"
 
 scalacOptions := List(
   "-encoding",
@@ -16,6 +16,8 @@ scalacOptions := List(
   "-Ymacro-annotations"
 )
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.0" % "test"
+libraryDependencies += "org.typelevel" %% "cats-core" % "2.9.0"
+libraryDependencies += "org.typelevel" %% "cats-mtl"  % "1.3.0"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.15" % "test"
 
 wartremoverErrors ++= Seq[Wart](Any, AsInstanceOf, Null, Return, Throw, While, MutableDataStructures)
