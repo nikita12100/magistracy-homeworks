@@ -18,6 +18,7 @@ scalacOptions := List(
 
 libraryDependencies += "org.typelevel" %% "cats-core" % "2.9.0"
 libraryDependencies += "org.typelevel" %% "cats-mtl"  % "1.3.0"
+libraryDependencies += "tf.tofu"       %% "glass"     % "0.2.1"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.15" % "test"
 
 wartremoverErrors ++= Seq[Wart](Any, AsInstanceOf, Null, Return, Throw, While, MutableDataStructures)
