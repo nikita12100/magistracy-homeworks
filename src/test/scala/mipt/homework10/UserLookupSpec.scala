@@ -3,7 +3,7 @@ package mipt.homework10
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class UserLookupSpec extends AnyFlatSpec with Matchers:
+class UserLookupSpec extends AnyFlatSpec, Matchers:
   val user: User = User(UserId(42), Role.Admin, Vector(UserId(1), UserId(2), UserId(3)))
 
   it should "get id" in {
